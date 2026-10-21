@@ -671,7 +671,7 @@ const REC = {
       p1: {
         key:'cashisa', icon:'💼', bg:'#E0EEFF', rate:'5.17% AER',
         desc:'Tax-free returns on everything you save automatically. Keep every penny of interest.',
-        why:'<strong>42.6%</strong> of PLG Auto-save users transitioned to Cash ISA — the strongest organic 1→2 product move in the entire dataset. Upgrading CP1 (Reformed Spender) to a tax wrapper lifts their D14 LTV from <strong>£16.28 → £118.88</strong> at 24m.',
+        why:'<strong>42.6%</strong> of Auto-save users transitioned to Cash ISA — the strongest organic 1→2 move in the dataset. CS and SB archetypes (Conscious Strivers + Squeezed Builders) have Plum balances of £199–£566 and SoW of 1.1–2.3%. Cash ISA is the upgrade that lifts share of wallet.',
         signal: 42.6, sigLabel: 'PLG transition rate',
         disclaimer: null
       },
@@ -697,7 +697,7 @@ const REC = {
         desc:'A flexible pot alongside your ISA — for money you might need to access before the ISA fills up.',
         why:'Experian data: <strong>70–80%</strong> of Cash ISA users have an Easy Access account elsewhere. Only <strong>1%</strong> have it on Plum — suppressed demand, not lack of intent. Rate arbitrage is the hook.',
         signal: 1.0, sigLabel: 'Have it on Plum (Experian baseline)',
-        disclaimer: '⚠️ LISA is not recommended here. The Cash ISA ICP skews older (CP6 45–60, CP12 45–65). Only 3% PLG transition to LISA and many would fail the 18–39 eligibility check — creating friction without LTV upside.'
+        disclaimer: '⚠️ LISA is not recommended here. The Cash ISA ICP is Active Optimisers (AO Sub-A: HoH 58 · AO Sub-B: HoH 44) — both outside the 18–39 eligibility window. Only 3% transition to LISA — friction outweighs upside.'
       }
     },
     lisa: {
@@ -722,9 +722,9 @@ const REC = {
       p1: {
         key:'cashisa', icon:'💼', bg:'#E0EEFF', rate:'5.17% AER',
         desc:'Same great rate as your Easy Access — but 100% of your interest is tax-free.',
-        why:'<strong>14.5%</strong> PLG transition from Easy Access → Cash ISA. Easy Access users are rate-seekers; Cash ISA offers the same motivation with a tax efficiency upgrade. One-liner: "Same returns, zero tax." ICP (CP12 Affluent Whale 45–65, CP8 Anxious Retiree 60–70) makes LISA almost certainly ineligible.',
-        signal: 14.5, sigLabel: 'PLG transition rate',
-        disclaimer: '⚠️ LISA not recommended. Dominant ICPs (CP12 45–65, CP8 60–70) are outside the 18–39 eligibility window and likely already own homes. Showing LISA here would create friction for the majority.'
+        why:'<strong>14.5%</strong> transition from Easy Access → Cash ISA. Easy Access users are rate-seekers; Cash ISA offers the same motivation with a tax efficiency upgrade. "Same returns, zero tax." ICP is AO Sub-A (K33 Interest Seekers, HoH 58) — well outside LISA\'s 18–39 window, 54.5% own outright.',
+        signal: 14.5, sigLabel: 'Transition rate',
+        disclaimer: '⚠️ LISA not recommended. AO Sub-A (Established Saver, HoH 58) is outside the 18–39 eligibility window and 54.5% own their home outright. Showing LISA creates friction for the dominant ICP.'
       },
       p2: {
         key:'pluminterest', icon:'💸', bg:'#D1FAE5', rate:'Earn automatically',
@@ -739,14 +739,14 @@ const REC = {
       p1: {
         key:'cashisa', icon:'💼', bg:'#E0EEFF', rate:'5.17% AER',
         desc:'A tax-free savings buffer alongside your investments. Earns well while your portfolio grows.',
-        why:'<strong>5.2%</strong> PLG ISA/GIA transition to Cash ISA. CP7 (Active Wealth Optimiser, highest LTV at <strong>£45.05</strong> 24m) understands diversification — Cash ISA is the natural liquidity buffer. No eligibility risk, immediate value.',
+        why:'<strong>5.2%</strong> ISA/GIA transition to Cash ISA. HB (Household Builders) Sub-A (F17 Smart Upgraders, HoH 44, Plum balance £6,024, SoW 5.9%) and Sub-B (G21 Dual Diligence, HoH 39.7) understand diversification — Cash ISA is the natural liquidity buffer.',
         signal: 5.2, sigLabel: 'PLG transition rate',
         disclaimer: null
       },
       p2: {
         key:'lisa', icon:'🏠', bg:'#D1FAE5', rate:'25% government bonus',
         desc:'Get a 25% government top-up on up to £4,000/year. For your first home or retirement.',
-        why:'<strong>7.3%</strong> PLG ISA/GIA transition to LISA — the highest LISA signal of any first product. CP7 is 30s–50s: a meaningful subset will be under 40 and eligible. This is the one scenario where LISA as a secondary recommendation is defensible.',
+        why:'<strong>7.3%</strong> ISA/GIA transition to LISA — the highest LISA signal of any first product. HB Sub-B (G21 Dual Diligence, HoH 39.7, 30–45) has the strongest under-40 concentration. HB Sub-A (HoH 44) also has a meaningful eligible subset. This is the one scenario where LISA as a secondary is defensible.',
         signal: 7.3, sigLabel: 'PLG transition rate',
         disclaimer: '⚠️ Must be aged 18–39 to open a Lifetime ISA. Show eligibility copy on the recommendation card. Fallback: Easy Access if user dismisses or is ineligible.'
       }
@@ -783,56 +783,57 @@ const SIGNALS = {
   easyaccess: [
     ['Transition matrix', 'Easy Access → Cash ISA', '14.5%'],
     ['Transition matrix', 'Easy Access → LISA', '5.2%'],
-    ['ICP dominant', 'CP12 Affluent Whale', '45–65 (LISA ineligible)'],
-    ['ICP dominant', 'CP8 Anxious Retiree', '60–70 (LISA ineligible)'],
-    ['D14 LTV (24m)', 'Easy Access single-product', '£2.93'],
-    ['D14 LTV (24m)', 'Cash ISA single-product', '£118.88'],
+    ['ICP', 'AO Sub-A — Established Saver (K33)', 'HoH 58 · 45–65 · LISA ineligible'],
+    ['ICP', '54.5% own outright', 'No LISA eligibility'],
+    ['Plum balance (AO)', 'Active Optimisers archetype', '£15,342 · SoW 9.9%'],
+    ['Experian FGXI', 'AO Sub-A savings', '£45k · discretionary £1,176/mo'],
   ],
   investments: [
     ['Transition matrix', '→ Cash ISA', '5.2%'],
     ['Transition matrix', '→ LISA', '7.3%'],
     ['Transition matrix', '→ Easy Access', '2.1%'],
     ['D14 LTV (24m)', 'ISA/GIA single-product', '£76.02'],
-    ['ICP match', 'CP7 Active Wealth Optimiser', '30s–50s, LTV £45.05'],
-    ['ICP eligibility', 'LISA eligible sub-set', 'Those aged 18–39'],
+    ['ICP', 'HB Sub-A — Platform Builder (F17)', 'HoH 44 · Plum balance £6,024 · SoW 5.9%'],
+    ['ICP', 'HB Sub-B — Aspiring Builder (G21)', 'HoH 39.7 · Plum balance £5,051 · SoW 7.9%'],
+    ['LISA eligibility', 'Meaningful under-40 subset in both HB sub-segments', 'Sub-B strongest candidate'],
   ],
 };
 
 const ICP = {
   autosave: {
-    chips: ['CP1 Reformed Spender'],
-    age: '20s–40s',
-    jtbd: 'Save without making a conscious decision every month. Automation as a substitute for willpower that has already failed.',
-    ltv: { '12m': '£9.31', '24m': '£16.97' },
-    note: 'CP1 is the acquisition funnel entry point, not the destination ICP. The strategy doc explicitly says "move CP1 to ICP ASAP." Cross-selling Cash ISA is the mechanism that lifts their LTV toward CP2b (£12.71) territory. Plum Interest as secondary is the lowest-friction path to get them earning while the habit forms.'
+    chips: ['CS — Conscious Strivers', 'SB — Squeezed Builders'],
+    age: 'CS Sub-A (Constrained Renter): 30–55 · CS Sub-B (Aspiring Owner): 26–45 · SB Sub-A (Single-Front Family): 26–42',
+    jtbd: 'Save without making a conscious decision every month. Automation as a substitute for willpower under structural financial pressure.',
+    ltv: { 'Plum balance': 'CS £199 · SB £566', 'SoW': 'CS 1.1% · SB 2.3%' },
+    note: 'Conscious Strivers (CS: £45–164/mo discretionary) and Squeezed Builders (SB: £381–473/mo) are the dominant Auto-save archetypes — automation appeals most to users who can\'t rely on willpower because budgets are tight. Cross-selling Cash ISA upgrades them from behaviour-driven saving to tax-wrapper saving, lifting share of wallet. Plum Interest is the lowest-friction path to get them earning while the habit forms. Source: Experian Mosaic FGXI, Aug–Sep 2026 (970,723 matched users).'
   },
   cashisa: {
-    chips: ['CP6 Pre-retiree (45–60)', 'CP12 Affluent Whale (45–65)', 'CP2b Consistent Builder (20s–30s)'],
-    age: 'Skews significantly older. Two of three dominant ICPs are 45+.',
-    jtbd: 'Tax-efficient savings / Rate optimisation with full protection.',
-    ltv: { '12m': '−£32.35 (adjusted)', '24m': '£118.88' },
-    note: 'LISA eligibility ruled out for CP6 and CP12 (aged out, likely home-owners). CP2b might qualify but has already chosen CISA over LISA — surfacing LISA creates doubt, not value. Easy Access + Plum Interest avoid all eligibility risk while addressing the 70–80% Experian signal of Easy Access demand.'
+    chips: ['AO Sub-A — Established Saver (45–65)', 'AO Sub-B — Active Accumulator (35–55)'],
+    age: 'AO Sub-A: HoH 58, age 45–65+ · AO Sub-B: HoH 44, age 35–55. Both outside LISA\'s 18–39 window.',
+    jtbd: 'Maximise returns on accumulated cash with full capital protection and tax efficiency.',
+    ltv: { 'Plum balance': '£15,342 (AO archetype)', 'SoW': '9.9%' },
+    note: 'Active Optimisers (AO) are Plum\'s highest-balance users. Sub-A (K33 Interest Seekers, HoH 58) are largely mortgage-free (54.5% own outright) with £45k savings and 83% savings account penetration — will leave for a better rate. Sub-B (F16 Mortgage Masters, HoH 44, £110k HH income) are still accumulating and have the highest investable assets (£167k). Both are outside LISA\'s 18–39 window. Experian: 70–80% of CISA users hold Easy Access elsewhere, only ~1% on Plum. Source: Experian Mosaic FGXI, Aug–Sep 2026.'
   },
   lisa: {
-    chips: ['CP2a Home Buyer (mid-late 20s)'],
-    age: 'Confirmed 18–39 (LISA eligibility self-confirmed by product choice)',
-    jtbd: 'Saving for a first home with a specific goal and government bonus. Feel in control and make progress.',
-    ltv: { '12m': '−£8.40 (adjusted)', '24m': '£9.30' },
-    note: 'Cash ISA as cross-sell is unusually clean here: CP2a has confirmed they\'re 18–39 (so CISA eligibility is guaranteed), and they have a specific savings goal that naturally overflows the £4K LISA cap. No eligibility friction, strong intent alignment, second-highest PLG transition rate.'
+    chips: ['CS Sub-B — Aspiring Owner (26–45)'],
+    age: 'HoH 40, age 26–45. Product choice self-confirms 18–39 LISA eligibility. 47,171 LISA First Users in Experian dataset.',
+    jtbd: 'Save for a first home deposit with the 25% government bonus. Have a clear, goal-directed pathway to ownership.',
+    ltv: { 'Plum balance': '£199 (CS archetype)', 'SoW': '1.1%' },
+    note: 'CS Sub-B (Budget Navigators — H24 Sensible Settlers, H25 Price-conscious Parents) are Plum\'s confirmed LISA users. £37.6k HH income, £164/mo discretionary — constrained but goal-directed. Choosing LISA self-confirms 18–39 eligibility, so a Cash ISA cross-sell carries zero eligibility friction. The £4K LISA cap makes Cash ISA the natural overflow vehicle. Open question: what keeps this user on platform after the first home purchase completes? Source: Experian Mosaic FGXI, Aug–Sep 2026 (47,171 LISA First Users matched).'
   },
   easyaccess: {
-    chips: ['CP12 Affluent Whale (45–65)', 'CP8 Anxious Retiree (60–70)'],
-    age: 'Significantly older. Near-zero LISA eligibility probability.',
-    jtbd: 'Competitive rate with full liquidity and capital protection.',
-    ltv: { '12m': '£1.82', '24m': '£2.93' },
-    note: 'Both dominant ICPs are well outside LISA\'s 18–39 window and almost certainly home-owners. Cash ISA is the only defensible cross-sell: same rate-seeking motivation, adds tax efficiency without complexity. "Same returns, zero tax" is a compelling one-liner for a rate-seeker. Plum Interest fills the gap for money not yet deposited.'
+    chips: ['AO Sub-A — Established Saver (45–65)'],
+    age: 'HoH 58, age 45–65+. 54.5% own outright. Well outside LISA\'s 18–39 window.',
+    jtbd: 'Competitive rate with full liquidity and capital protection. No lock-in.',
+    ltv: { 'Plum balance': '£15,342 (AO archetype)', 'SoW': '9.9%' },
+    note: 'AO Sub-A (K33 Interest Seekers) are entrepreneurial older households with 83% savings account penetration, largely mortgage-free. They rate-compare actively — the same motivation that brings them to Easy Access makes "same returns, zero tax" an immediately legible upgrade to Cash ISA. LISA is clearly off the table: HoH 58, 54.5% own outright. Cash ISA is the only defensible cross-sell; Plum Interest earns on the balance not yet committed. Source: Experian Mosaic FGXI, Aug–Sep 2026.'
   },
   investments: {
-    chips: ['CP7 Active Wealth Optimiser (30s–50s)'],
-    age: '30s–50s — partial LISA eligibility for the under-40 sub-set.',
-    jtbd: 'Orchestrate intelligently across products without it becoming a second job.',
-    ltv: { '12m': '£27.08', '24m': '£45.05' },
-    note: 'Highest LTV ICP in Plum\'s base. Understands diversification intuitively — Cash ISA as a safety buffer is immediately legible. LISA as a secondary is defensible at 7.3% transition signal but must carry the 18–39 disclaimer. Fallback: Easy Access if user is ineligible.'
+    chips: ['HB Sub-A — Platform Builder (35–48)', 'HB Sub-B — Aspiring Builder (30–45)'],
+    age: 'Sub-A: HoH 44, 35–48 · Sub-B: HoH 39.7, 30–45. Both have a meaningful under-40 subset.',
+    jtbd: 'Grow wealth intelligently across a complex, multi-platform financial life — without it becoming a second job.',
+    ltv: { 'Plum balance': 'Sub-A £6,024 · Sub-B £5,051', 'SoW': 'Sub-A 5.9% · Sub-B 7.9%' },
+    note: 'Household Builders (HB) are Plum\'s most financially active users. Sub-A (F17 Smart Upgraders, HoH 44) are dual-income professionals managing wealth across multiple platforms — Plum competes with HL and Vanguard. Sub-B (G21 Dual Diligence, HoH 39.7) may have Plum as their first and only investment platform — the highest consolidation opportunity in the dataset. Both sub-segments have a meaningful under-40 population making LISA defensible as a secondary. Sub-B is the stronger LISA candidate (HoH 39.7). Source: Experian Mosaic FGXI, Aug–Sep 2026.'
   }
 };
 
@@ -928,7 +929,7 @@ function renderPanel(key) {
           <td>${d.p2.signal !== null ? d.p2.signal+'%' : '—'}</td>
           <td class="dim">${d.p2.why.replace(/<[^>]+>/g,'').substring(0,90)}…</td>
         </tr>
-        ${(key==='cashisa'||key==='easyaccess') ? `<tr><td><span class="no-badge">No LISA</span></td><td colspan="3" class="dim">CISA ICP skews 45+. Only 3% actual PLG transition. Eligibility risk outweighs upside.</td></tr>` : ''}
+        ${(key==='cashisa'||key==='easyaccess') ? `<tr><td><span class="no-badge">No LISA</span></td><td colspan="3" class="dim">AO Sub-A (HoH 58) and AO Sub-B (HoH 44) are outside the 18–39 window. Only 3% transition rate. Eligibility risk outweighs upside.</td></tr>` : ''}
       </tbody>
     </table>
     <div class="reasoning-box">
@@ -952,7 +953,8 @@ function renderPanel(key) {
     <dl class="icp-detail">
       <dt>Age range</dt><dd>${icp.age}</dd>
       <dt>Job to be done</dt><dd>${icp.jtbd}</dd>
-      <dt>D14 LTV</dt><dd>12m: ${icp.ltv['12m']} · 24m: ${icp.ltv['24m']}</dd>
+      <dt>Plum balance</dt><dd>${icp.ltv['Plum balance']}</dd>
+      <dt>Share of wallet</dt><dd>${icp.ltv['SoW']}</dd>
     </dl>
     <div class="reasoning-box" style="margin-top:12px;">${icp.note}</div>
   `;
