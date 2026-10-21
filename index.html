@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product Bundling Simulator — Plum</title>
+<style>
+:root {
+  --purple: #7B2FBE;
+  --purple-light: #9B5DCC;
+  --purple-dark: #5A1F8E;
+  --purple-faint: #F4EEFF;
+  --purple-pale: #EDE0FA;
+  --gray-bg: #F2F2F7;
+  --white: #FFFFFF;
+  --text-dark: #111122;
+  --text-mid: #555570;
+  --text-muted: #9999B2;
+  --border: #E5E5ED;
+  --green: #00C896;
+  --amber: #F59E0B;
+  --amber-bg: #FFFBEB;
+  --amber-border: #FDE68A;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+  background: var(--gray-bg);
+  min-height: 100vh;
+  padding: 48px 24px 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── Top header ── */
+.page-header {
+  width: 100%;
+  max-width: 980px;
+  margin-bottom: 36px;
+}
+.page-header h1 {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text-dark);
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+.page-header p {
+  font-size: 14px;
+  color: var(--text-mid);
+}
+
+
+/* ── Main layout ── */
+.layout {
+  display: flex;
+  gap: 28px;
+  width: 100%;
+  max-width: 980px;
+  align-items: flex-start;
+}
+
+/* ── Phone frame ── */
+.phone-wrap {
+  flex-shrink: 0;
+  width: 360px;
+}
+.phone {
+  width: 360px;
+  background: var(--white);
+  border-radius: 44px;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.08),
+    0 8px 24px rgba(0,0,0,.10),
+    0 32px 80px rgba(0,0,0,.12);
+  overflow: hidden;
+  position: relative;
+}
+.phone-bar {
+  height: 44px;
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 22px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-dark);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.phone-icons {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 11px;
+}
+.screen-viewport {
+  height: 664px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Screens ── */
+.screen {
+  position: absolute;
+  inset: 0;
+  background: var(--white);
+  display: flex;
+  flex-direction: column;
+  transition: transform .32s cubic-bezier(.4,0,.2,1), opacity .32s;
+  will-change: transform;
+  overflow: hidden;
+}
+.screen.slide-left {
+  transform: translateX(-28%);
+  opacity: .4;
+  pointer-events: none;
+}
+.screen.slide-right {
+  transform: translateX(100%);
+}
+
+/* ── Screen 1: Product Selection ── */
+.s1-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 22px 16px 0;
+  -webkit-overflow-scrolling: touch;
+}
+.s1-content::-webkit-scrollbar { display: none; }
+
+.s1-title { font-size: 19px; font-weight: 800; color: var(--text-dark); letter-spacing: -.02em; margin-bottom: 3px; }
+.s1-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+
+.pcard {
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 13px 14px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all .15s;
+  position: relative;
+  background: var(--white);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.pcard:active { transform: scale(.985); }
+.pcard:hover { border-color: #C5A0E6; background: #FDFAFF; }
+.pcard.sel { border-color: var(--purple); background: var(--purple-faint); }
+
+.pcard-check {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--purple);
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.pcard.sel .pcard-check { display: flex; }
+.pcard-check svg { width: 12px; height: 12px; }
+
+.picon {
+  width: 42px; height: 42px;
+  border-radius: 13px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.pinfo { flex: 1; min-width: 0; }
+.pname-row { display: flex; align-items: center; gap: 7px; margin-bottom: 2px; }
+.pname { font-size: 15px; font-weight: 700; color: var(--text-dark); }
+
+.badge-popular {
+  background: var(--purple-pale);
+  color: var(--purple);
+  font-size: 10px; font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 5px;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+.prate { font-size: 13px; font-weight: 700; color: var(--purple); margin-bottom: 2px; }
+.pdesc { font-size: 12px; color: var(--text-mid); line-height: 1.45; }
+
+/* S1 footer */
+.s1-footer {
+  padding: 14px 16px 20px;
+  background: linear-gradient(to top, #fff 60%, transparent);
+  flex-shrink: 0;
+}
+.btn-main {
+  width: 100%;
+  padding: 15px;
+  border-radius: 16px;
+  border: none;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .15s;
+  background: var(--purple);
+  color: #fff;
+  opacity: .38;
+  pointer-events: none;
+}
+.btn-main.on { opacity: 1; pointer-events: all; }
+.btn-main.on:hover { background: var(--purple-dark); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(123,47,190,.4); }
+.btn-main.on:active { transform: translateY(0); }
+
+/* ── Screen 2: Bundling ── */
+.s2-hero {
+  padding: 20px 18px 28px;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.s2-back {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,.82);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.s2-hero h2 {
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -.02em;
+  margin-bottom: 6px;
+  line-height: 1.25;
+  max-width: 72%;
+}
+.s2-hero p {
+  font-size: 13px;
+  color: rgba(255,255,255,.78);
+  line-height: 1.5;
+  max-width: 70%;
+}
+.hero-deco {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  font-size: 80px;
+  line-height: 1;
+  opacity: .92;
+  pointer-events: none;
+}
+.s2-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 16px 0;
+}
+.s2-body::-webkit-scrollbar { display: none; }
+
+.section-lbl {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: 10px;
+}
+
+.rec-card {
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 10px;
+  background: var(--white);
+}
+.rec-card.primary { border-color: var(--purple); background: var(--purple-faint); }
+
+.rc-header { display: flex; align-items: center; gap: 11px; margin-bottom: 10px; }
+.rc-icon {
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.rc-name { font-size: 15px; font-weight: 700; color: var(--text-dark); }
+.rc-rate { font-size: 12px; font-weight: 600; color: var(--purple); }
+.rc-pill {
+  margin-left: auto;
+  font-size: 10px; font-weight: 800;
+  padding: 3px 9px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+.rc-pill.p1 { background: var(--purple); color: #fff; }
+.rc-pill.p2 { background: #E8E8F2; color: var(--text-muted); }
+
+.signal-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.sig-label { font-size: 11px; color: var(--text-muted); min-width: 110px; }
+.bar-track {
+  flex: 1;
+  height: 5px;
+  background: #E5E5ED;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  background: var(--purple);
+  border-radius: 3px;
+  transition: width .4s ease;
+}
+.sig-pct { font-size: 11px; font-weight: 700; color: var(--purple); min-width: 36px; text-align: right; }
+
+.rc-desc { font-size: 12px; color: var(--text-mid); line-height: 1.5; margin-bottom: 8px; }
+.rc-why {
+  background: rgba(0,0,0,.04);
+  border-radius: 10px;
+  padding: 9px 11px;
+  font-size: 11px;
+  color: var(--text-mid);
+  line-height: 1.55;
+}
+.rc-disclaimer {
+  background: var(--amber-bg);
+  border: 1px solid var(--amber-border);
+  border-radius: 9px;
+  padding: 9px 11px;
+  font-size: 11px;
+  color: #92400E;
+  line-height: 1.5;
+  margin-top: 8px;
+}
+
+.s2-footer {
+  padding: 12px 16px 20px;
+  background: linear-gradient(to top, #fff 55%, transparent);
+  flex-shrink: 0;
+}
+.btn-both {
+  width: 100%;
+  padding: 15px;
+  border-radius: 16px;
+  border: none;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  background: var(--purple);
+  color: #fff;
+  margin-bottom: 6px;
+}
+.btn-both:hover { background: var(--purple-dark); }
+.btn-skip {
+  width: 100%;
+  padding: 11px;
+  border: none;
+  background: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+/* ── Info panel ── */
+.info-panel { flex: 1; min-width: 0; }
+
+.info-card {
+  background: var(--white);
+  border-radius: 20px;
+  padding: 22px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.05);
+}
+.info-card h3 {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin-bottom: 14px;
+  letter-spacing: -.01em;
+}
+
+.empty-msg {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+.empty-msg .big { font-size: 36px; margin-bottom: 10px; }
+
+.logic-table { width: 100%; border-collapse: collapse; }
+.logic-table th {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  padding: 5px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.logic-table td {
+  font-size: 13px;
+  color: var(--text-dark);
+  padding: 9px 8px;
+  border-bottom: 1px solid #F4F4F8;
+  vertical-align: top;
+}
+.logic-table tr:last-child td { border-bottom: none; }
+.logic-table .hl { color: var(--purple); font-weight: 700; }
+.logic-table .dim { color: var(--text-muted); font-size: 11px; }
+
+.reasoning-box {
+  background: var(--gray-bg);
+  border-radius: 12px;
+  padding: 13px 14px;
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--text-mid);
+  line-height: 1.6;
+}
+.reasoning-box strong { color: var(--text-dark); font-weight: 700; }
+.reasoning-box .rl {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.flag-box {
+  background: var(--amber-bg);
+  border: 1px solid var(--amber-border);
+  border-radius: 10px;
+  padding: 11px 13px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: #78350F;
+  line-height: 1.55;
+}
+
+.signal-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid #F4F4F8;
+}
+.signal-row:last-child { border-bottom: none; }
+.sig-source { font-size: 11px; color: var(--text-muted); min-width: 120px; }
+.sig-metric { font-size: 13px; color: var(--text-dark); flex: 1; }
+.sig-value { font-size: 13px; font-weight: 700; color: var(--purple); }
+.sig-value.neutral { color: var(--text-mid); }
+
+.icp-chip {
+  display: inline-block;
+  background: var(--purple-pale);
+  color: var(--purple);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 6px;
+  margin: 3px 3px 3px 0;
+}
+.icp-detail {
+  font-size: 13px;
+  color: var(--text-mid);
+  line-height: 1.6;
+  margin-top: 10px;
+}
+.icp-detail dt {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  margin-top: 10px;
+  margin-bottom: 3px;
+}
+.icp-detail dd { color: var(--text-dark); font-size: 13px; }
+
+/* no LISA pill */
+.no-badge {
+  display: inline-block;
+  background: #FEE2E2;
+  color: #991B1B;
+  font-size: 10px; font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 5px;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 780px) {
+  .layout { flex-direction: column; align-items: center; }
+  .info-panel { width: 100%; max-width: 360px; }
+}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>🎯 Product Bundling Simulator</h1>
+  <p>Tap a product to see the 2nd product recommendation and full data reasoning.</p>
+</div>
+
+<div class="layout">
+
+  <!-- ══ PHONE ══ -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-bar">
+        <span>9:41</span>
+        <div class="phone-icons">
+          <svg width="17" height="11" fill="none"><rect x="0" y="3" width="3" height="8" rx="1" fill="#111"/><rect x="4.5" y="2" width="3" height="9" rx="1" fill="#111"/><rect x="9" y="0" width="3" height="11" rx="1" fill="#111"/><rect x="13.5" y="1" width="3" height="10" rx="1" fill="#111" opacity=".25"/></svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 2.4C10.2 2.4 12.2 3.3 13.6 4.8L15.2 3.1C13.3 1.2 10.8 0 8 0C5.2 0 2.7 1.2 0.8 3.1L2.4 4.8C3.8 3.3 5.8 2.4 8 2.4Z" fill="#111"/><path d="M8 5.6C9.3 5.6 10.5 6.1 11.4 7L13 5.3C11.6 4 9.9 3.2 8 3.2C6.1 3.2 4.4 4 3 5.3L4.6 7C5.5 6.1 6.7 5.6 8 5.6Z" fill="#111"/><circle cx="8" cy="10" r="2" fill="#111"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#111" stroke-opacity=".35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#111"/><path d="M23 4.5C23.8 4.9 24.5 5.4 24.5 6C24.5 6.6 23.8 7.1 23 7.5V4.5Z" fill="#111" opacity=".4"/></svg>
+        </div>
+      </div>
+
+      <div class="screen-viewport">
+
+        <!-- Screen 1 -->
+        <div class="screen" id="s1">
+          <div class="s1-content">
+            <div class="s1-title">Choose an account to get started</div>
+            <div class="s1-sub">Available to you in the UK</div>
+
+            <div class="pcard" onclick="pick('autosave',this)">
+              <div class="pcard-check"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div class="picon" style="background:#EDE0FA;">🤖</div>
+              <div class="pinfo">
+                <div class="pname-row"><span class="pname">Automated savings</span><span class="badge-popular">Popular</span></div>
+                <div class="pdesc">Save without thinking about it. Set it up once, runs automatically.</div>
+              </div>
+            </div>
+
+            <div class="pcard" onclick="pick('cashisa',this)">
+              <div class="pcard-check"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div class="picon" style="background:#E0EEFF;">💼</div>
+              <div class="pinfo">
+                <div class="pname-row"><span class="pname">Cash ISA</span><span class="badge-popular">Popular</span></div>
+                <div class="prate">5.17% AER</div>
+                <div class="pdesc">Keep all your interest, tax free. Use it whenever you need.</div>
+              </div>
+            </div>
+
+            <div class="pcard" onclick="pick('lisa',this)">
+              <div class="pcard-check"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div class="picon" style="background:#D1FAE5;">🏠</div>
+              <div class="pinfo">
+                <div class="pname-row"><span class="pname">Lifetime ISA (var%) AER</span></div>
+                <div class="prate">Get 25% added on top, free</div>
+                <div class="pdesc">For your first home or retirement. Age 18–39 only.</div>
+              </div>
+            </div>
+
+            <div class="pcard" onclick="pick('easyaccess',this)">
+              <div class="pcard-check"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div class="picon" style="background:#FEF3C7;">⚡</div>
+              <div class="pinfo">
+                <div class="pname-row"><span class="pname">Plum Easy Access (5.17%) AER</span></div>
+                <div class="prate">5.17% AER</div>
+                <div class="pdesc">Save any amount, no annual limit. Withdraw anytime.</div>
+              </div>
+            </div>
+
+            <div class="pcard" onclick="pick('investments',this)">
+              <div class="pcard-check"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div class="picon" style="background:#FFE4E6;">📈</div>
+              <div class="pinfo">
+                <div class="pname-row"><span class="pname">Stocks & Shares ISA</span></div>
+                <div class="pdesc">Invest tax-free for long-term growth. Capital at risk.</div>
+              </div>
+            </div>
+
+            <div style="height:8px;"></div>
+          </div>
+
+          <div class="s1-footer">
+            <button class="btn-main" id="continueBtn" onclick="openScreen2()">Continue</button>
+          </div>
+        </div>
+
+        <!-- Screen 2 -->
+        <div class="screen slide-right" id="s2">
+          <div class="s2-hero" id="heroBlock">
+            <button class="s2-back" onclick="closeScreen2()">‹ Back</button>
+            <h2 id="heroTitle">–</h2>
+            <p id="heroSub">–</p>
+            <div class="hero-deco" id="heroDeco">💰</div>
+          </div>
+          <div class="s2-body">
+            <div class="section-lbl">We think you'd also love</div>
+            <div id="rec1"></div>
+            <div id="rec2"></div>
+            <div style="height:12px;"></div>
+          </div>
+          <div class="s2-footer">
+            <button class="btn-both" onclick="closeScreen2()">Continue with both</button>
+            <button class="btn-skip" onclick="closeScreen2()">Continue with just <span id="skipName">this</span></button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ INFO PANEL ══ -->
+  <div class="info-panel">
+
+    <div class="info-card" id="emptyCard">
+      <div class="empty-msg">
+        <div class="big">👆</div>
+        <p>Select a product from the phone to see the recommendation logic, data signals, and ICP analysis.</p>
+      </div>
+    </div>
+
+    <div id="logicCard" class="info-card" style="display:none;">
+      <h3 id="logicTitle">Recommendation map</h3>
+      <div id="logicContent"></div>
+    </div>
+
+    <div id="signalsCard" class="info-card" style="display:none;">
+      <h3>Data signals</h3>
+      <div id="signalsContent"></div>
+    </div>
+
+    <div id="icpCard" class="info-card" style="display:none;">
+      <h3>ICP analysis</h3>
+      <div id="icpContent"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════
+   DATA
+════════════════════════════════ */
+const PRODUCTS = {
+  autosave:    { name: 'Automated savings', shortName: 'Auto-save' },
+  cashisa:     { name: 'Cash ISA',          shortName: 'Cash ISA' },
+  lisa:        { name: 'Lifetime ISA',      shortName: 'LISA' },
+  easyaccess:  { name: 'Easy Access',       shortName: 'Easy Access' },
+  investments: { name: 'Stocks & Shares ISA', shortName: 'Investments' },
+  pluminterest:{ name: 'Plum Interest',     shortName: 'Plum Interest' },
+};
+
+const REC = {
+    autosave: {
+      hero: { title: 'Grow your automated savings', sub: 'Your savings are moving automatically. Now give them a tax-free wrapper.', deco: '🏦', grad: 'linear-gradient(135deg,#7B2FBE 0%,#9B5DCC 100%)' },
+      p1: {
+        key:'cashisa', icon:'💼', bg:'#E0EEFF', rate:'5.17% AER',
+        desc:'Tax-free returns on everything you save automatically. Keep every penny of interest.',
+        why:'<strong>42.6%</strong> of PLG Auto-save users transitioned to Cash ISA — the strongest organic 1→2 product move in the entire dataset. Upgrading CP1 (Reformed Spender) to a tax wrapper lifts their D14 LTV from <strong>£16.28 → £118.88</strong> at 24m.',
+        signal: 42.6, sigLabel: 'PLG transition rate',
+        disclaimer: null
+      },
+      p2: {
+        key:'pluminterest', icon:'💸', bg:'#D1FAE5', rate:'Earn automatically',
+        desc:'Earn interest on your Plum balance with zero extra setup. Perfect while your habit builds.',
+        why:'<strong>66.3%</strong> of PLG Auto-save users started Plum Interest onboarding — the highest cross-product intent signal in the data. Lowest-friction cross-sell: earns on savings already moving.',
+        signal: 66.3, sigLabel: 'Started onboarding',
+        disclaimer: null
+      }
+    },
+    cashisa: {
+      hero: { title: 'Make every pound count', sub: 'Your Cash ISA is set up. Now earn on the money waiting to go in.', deco: '🏺', grad: 'linear-gradient(135deg,#7B2FBE 0%,#5B8DEF 100%)' },
+      p1: {
+        key:'pluminterest', icon:'💸', bg:'#D1FAE5', rate:'Earn automatically',
+        desc:'Earn interest on your Plum balance automatically — perfect alongside your Cash ISA.',
+        why:'<strong>37.1%</strong> of PLG Cash ISA users started Plum Interest onboarding. Highest cross-product intent signal for this cohort. Framing: earn on the money waiting to go into your ISA. Zero eligibility risk, immediate value.',
+        signal: 37.1, sigLabel: 'Started onboarding',
+        disclaimer: null
+      },
+      p2: {
+        key:'easyaccess', icon:'⚡', bg:'#FEF3C7', rate:'5.17% AER',
+        desc:'A flexible pot alongside your ISA — for money you might need to access before the ISA fills up.',
+        why:'Experian data: <strong>70–80%</strong> of Cash ISA users have an Easy Access account elsewhere. Only <strong>1%</strong> have it on Plum — suppressed demand, not lack of intent. Rate arbitrage is the hook.',
+        signal: 1.0, sigLabel: 'Have it on Plum (Experian baseline)',
+        disclaimer: '⚠️ LISA is not recommended here. The Cash ISA ICP skews older (CP6 45–60, CP12 45–65). Only 3% PLG transition to LISA and many would fail the 18–39 eligibility check — creating friction without LTV upside.'
+      }
+    },
+    lisa: {
+      hero: { title: 'Saving for your first home', sub: 'Your LISA is ready. Max your tax-free savings with a Cash ISA for anything above the £4K limit.', deco: '🏡', grad: 'linear-gradient(135deg,#059669 0%,#7B2FBE 100%)' },
+      p1: {
+        key:'cashisa', icon:'💼', bg:'#E0EEFF', rate:'5.17% AER',
+        desc:'Save beyond your £4K LISA limit, tax-free. Both ISAs working together for your deposit.',
+        why:'<strong>10.6%</strong> PLG transition — the strongest financial product transition from LISA in the dataset. Business logic: LISA caps at £4K/year. Cash ISA absorbs the overflow with identical tax efficiency. <strong>22.3%</strong> also started CISA onboarding, signalling a large intent gap to close.',
+        signal: 10.6, sigLabel: 'PLG transition rate',
+        disclaimer: null
+      },
+      p2: {
+        key:'pluminterest', icon:'💸', bg:'#D1FAE5', rate:'Earn automatically',
+        desc:'Earn on the money not yet locked into your LISA — while you build up to the £4K limit.',
+        why:'<strong>30.4%</strong> of PLG LISA users started Plum Interest onboarding. Natural complement — earns on savings not yet committed to either ISA product.',
+        signal: 30.4, sigLabel: 'Started onboarding',
+        disclaimer: null
+      }
+    },
+    easyaccess: {
+      hero: { title: 'Step up to tax-free returns', sub: 'Same competitive rate — but now you keep every penny of interest.', deco: '📦', grad: 'linear-gradient(135deg,#D97706 0%,#7B2FBE 100%)' },
+      p1: {
+        key:'cashisa', icon:'💼', bg:'#E0EEFF', rate:'5.17% AER',
+        desc:'Same great rate as your Easy Access — but 100% of your interest is tax-free.',
+        why:'<strong>14.5%</strong> PLG transition from Easy Access → Cash ISA. Easy Access users are rate-seekers; Cash ISA offers the same motivation with a tax efficiency upgrade. One-liner: "Same returns, zero tax." ICP (CP12 Affluent Whale 45–65, CP8 Anxious Retiree 60–70) makes LISA almost certainly ineligible.',
+        signal: 14.5, sigLabel: 'PLG transition rate',
+        disclaimer: '⚠️ LISA not recommended. Dominant ICPs (CP12 45–65, CP8 60–70) are outside the 18–39 eligibility window and likely already own homes. Showing LISA here would create friction for the majority.'
+      },
+      p2: {
+        key:'pluminterest', icon:'💸', bg:'#D1FAE5', rate:'Earn automatically',
+        desc:'Earn on your Plum balance automatically — on top of your Easy Access pot.',
+        why:'Natural complement for money not yet deposited into Easy Access. Low friction, immediate value.',
+        signal: null, sigLabel: null,
+        disclaimer: null
+      }
+    },
+    investments: {
+      hero: { title: 'Balance growth with security', sub: 'Smart investors keep a tax-free buffer. Earn while your portfolio grows.', deco: '⚖️', grad: 'linear-gradient(135deg,#DC2626 0%,#7B2FBE 100%)' },
+      p1: {
+        key:'cashisa', icon:'💼', bg:'#E0EEFF', rate:'5.17% AER',
+        desc:'A tax-free savings buffer alongside your investments. Earns well while your portfolio grows.',
+        why:'<strong>5.2%</strong> PLG ISA/GIA transition to Cash ISA. CP7 (Active Wealth Optimiser, highest LTV at <strong>£45.05</strong> 24m) understands diversification — Cash ISA is the natural liquidity buffer. No eligibility risk, immediate value.',
+        signal: 5.2, sigLabel: 'PLG transition rate',
+        disclaimer: null
+      },
+      p2: {
+        key:'lisa', icon:'🏠', bg:'#D1FAE5', rate:'25% government bonus',
+        desc:'Get a 25% government top-up on up to £4,000/year. For your first home or retirement.',
+        why:'<strong>7.3%</strong> PLG ISA/GIA transition to LISA — the highest LISA signal of any first product. CP7 is 30s–50s: a meaningful subset will be under 40 and eligible. This is the one scenario where LISA as a secondary recommendation is defensible.',
+        signal: 7.3, sigLabel: 'PLG transition rate',
+        disclaimer: '⚠️ Must be aged 18–39 to open a Lifetime ISA. Show eligibility copy on the recommendation card. Fallback: Easy Access if user dismisses or is ineligible.'
+      }
+    }
+};
+
+const SIGNALS = {
+  autosave: [
+    ['Transition matrix', 'Auto-save → Cash ISA', '42.6%'],
+    ['Transition matrix', 'Auto-save → LISA', '9.4%'],
+    ['Transition matrix', 'Auto-save → Easy Access', '5.1%'],
+    ['Onboarding started', 'Auto-save + Plum Interest', '66.3%'],
+    ['Onboarding started', 'Auto-save + Cash ISA', '75.2%'],
+    ['D14 LTV (24m)', 'Auto-save single-product', '£16.28'],
+    ['D14 LTV (24m)', 'Cash ISA single-product', '£118.88'],
+  ],
+  cashisa: [
+    ['Transition matrix', 'Cash ISA → LISA', '3.0%'],
+    ['Transition matrix', 'Cash ISA → Easy Access', '1.0%'],
+    ['Onboarding started', 'Cash ISA + Plum Interest', '37.1%'],
+    ['Onboarding started', 'Cash ISA + LISA', '6.4%'],
+    ['Experian data', 'CISA users with Easy Access elsewhere', '70–80%'],
+    ['RFM data', 'CISA users with Easy Access on Plum', '~1%'],
+    ['D14 LTV (24m)', 'Cash ISA single-product', '£118.88'],
+  ],
+  lisa: [
+    ['Transition matrix', 'LISA → Cash ISA', '10.6%'],
+    ['Transition matrix', 'LISA → Easy Access', '0.8%'],
+    ['Onboarding started', 'LISA + Cash ISA', '22.3%'],
+    ['Onboarding started', 'LISA + Plum Interest', '30.4%'],
+    ['D14 LTV (24m)', 'LISA single-product', '£9.30'],
+    ['ICP confirmation', 'LISA implies age 18–39 eligibility', 'No eligibility check needed for CISA cross-sell'],
+  ],
+  easyaccess: [
+    ['Transition matrix', 'Easy Access → Cash ISA', '14.5%'],
+    ['Transition matrix', 'Easy Access → LISA', '5.2%'],
+    ['ICP dominant', 'CP12 Affluent Whale', '45–65 (LISA ineligible)'],
+    ['ICP dominant', 'CP8 Anxious Retiree', '60–70 (LISA ineligible)'],
+    ['D14 LTV (24m)', 'Easy Access single-product', '£2.93'],
+    ['D14 LTV (24m)', 'Cash ISA single-product', '£118.88'],
+  ],
+  investments: [
+    ['Transition matrix', '→ Cash ISA', '5.2%'],
+    ['Transition matrix', '→ LISA', '7.3%'],
+    ['Transition matrix', '→ Easy Access', '2.1%'],
+    ['D14 LTV (24m)', 'ISA/GIA single-product', '£76.02'],
+    ['ICP match', 'CP7 Active Wealth Optimiser', '30s–50s, LTV £45.05'],
+    ['ICP eligibility', 'LISA eligible sub-set', 'Those aged 18–39'],
+  ],
+};
+
+const ICP = {
+  autosave: {
+    chips: ['CP1 Reformed Spender'],
+    age: '20s–40s',
+    jtbd: 'Save without making a conscious decision every month. Automation as a substitute for willpower that has already failed.',
+    ltv: { '12m': '£9.31', '24m': '£16.97' },
+    note: 'CP1 is the acquisition funnel entry point, not the destination ICP. The strategy doc explicitly says "move CP1 to ICP ASAP." Cross-selling Cash ISA is the mechanism that lifts their LTV toward CP2b (£12.71) territory. Plum Interest as secondary is the lowest-friction path to get them earning while the habit forms.'
+  },
+  cashisa: {
+    chips: ['CP6 Pre-retiree (45–60)', 'CP12 Affluent Whale (45–65)', 'CP2b Consistent Builder (20s–30s)'],
+    age: 'Skews significantly older. Two of three dominant ICPs are 45+.',
+    jtbd: 'Tax-efficient savings / Rate optimisation with full protection.',
+    ltv: { '12m': '−£32.35 (adjusted)', '24m': '£118.88' },
+    note: 'LISA eligibility ruled out for CP6 and CP12 (aged out, likely home-owners). CP2b might qualify but has already chosen CISA over LISA — surfacing LISA creates doubt, not value. Easy Access + Plum Interest avoid all eligibility risk while addressing the 70–80% Experian signal of Easy Access demand.'
+  },
+  lisa: {
+    chips: ['CP2a Home Buyer (mid-late 20s)'],
+    age: 'Confirmed 18–39 (LISA eligibility self-confirmed by product choice)',
+    jtbd: 'Saving for a first home with a specific goal and government bonus. Feel in control and make progress.',
+    ltv: { '12m': '−£8.40 (adjusted)', '24m': '£9.30' },
+    note: 'Cash ISA as cross-sell is unusually clean here: CP2a has confirmed they\'re 18–39 (so CISA eligibility is guaranteed), and they have a specific savings goal that naturally overflows the £4K LISA cap. No eligibility friction, strong intent alignment, second-highest PLG transition rate.'
+  },
+  easyaccess: {
+    chips: ['CP12 Affluent Whale (45–65)', 'CP8 Anxious Retiree (60–70)'],
+    age: 'Significantly older. Near-zero LISA eligibility probability.',
+    jtbd: 'Competitive rate with full liquidity and capital protection.',
+    ltv: { '12m': '£1.82', '24m': '£2.93' },
+    note: 'Both dominant ICPs are well outside LISA\'s 18–39 window and almost certainly home-owners. Cash ISA is the only defensible cross-sell: same rate-seeking motivation, adds tax efficiency without complexity. "Same returns, zero tax" is a compelling one-liner for a rate-seeker. Plum Interest fills the gap for money not yet deposited.'
+  },
+  investments: {
+    chips: ['CP7 Active Wealth Optimiser (30s–50s)'],
+    age: '30s–50s — partial LISA eligibility for the under-40 sub-set.',
+    jtbd: 'Orchestrate intelligently across products without it becoming a second job.',
+    ltv: { '12m': '£27.08', '24m': '£45.05' },
+    note: 'Highest LTV ICP in Plum\'s base. Understands diversification intuitively — Cash ISA as a safety buffer is immediately legible. LISA as a secondary is defensible at 7.3% transition signal but must carry the 18–39 disclaimer. Fallback: Easy Access if user is ineligible.'
+  }
+};
+
+/* ════════════════════════════════
+   STATE & LOGIC
+════════════════════════════════ */
+let chosen = null;
+
+function pick(key, el) {
+  chosen = key;
+  document.querySelectorAll('.pcard').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById('continueBtn').classList.add('on');
+  // If s2 is visible, update it live
+  if (!document.getElementById('s2').classList.contains('slide-right')) {
+    renderScreen2(key);
+    renderPanel(key);
+  } else {
+    renderPanel(key);
+  }
+}
+
+function openScreen2() {
+  if (!chosen) return;
+  renderScreen2(chosen);
+  document.getElementById('s1').classList.add('slide-left');
+  document.getElementById('s2').classList.remove('slide-right');
+}
+
+function closeScreen2() {
+  document.getElementById('s1').classList.remove('slide-left');
+  document.getElementById('s2').classList.add('slide-right');
+}
+
+function renderScreen2(key) {
+  const d = REC[key];
+  const hero = document.getElementById('heroBlock');
+  hero.style.background = d.hero.grad;
+  document.getElementById('heroTitle').textContent = d.hero.title;
+  document.getElementById('heroSub').textContent = d.hero.sub;
+  document.getElementById('heroDeco').textContent = d.hero.deco;
+  document.getElementById('skipName').textContent = PRODUCTS[key].shortName;
+  document.getElementById('rec1').innerHTML = buildRecCard(d.p1, 'p1');
+  document.getElementById('rec2').innerHTML = buildRecCard(d.p2, 'p2');
+}
+
+function buildRecCard(r, rank) {
+  const sigHtml = r.signal !== null
+    ? `<div class="signal-bar">
+        <span class="sig-label">${r.sigLabel || 'Signal'}</span>
+        <div class="bar-track"><div class="bar-fill" style="width:${Math.min(r.signal*1.9,100)}%"></div></div>
+        <span class="sig-pct">${r.signal}%</span>
+       </div>`
+    : '';
+  const disclaimerHtml = r.disclaimer ? `<div class="rc-disclaimer">${r.disclaimer}</div>` : '';
+  return `
+    <div class="rec-card ${rank==='p1'?'primary':''}">
+      <div class="rc-header">
+        <div class="rc-icon" style="background:${r.bg}">${r.icon}</div>
+        <div>
+          <div class="rc-name">${PRODUCTS[r.key].name}</div>
+          <div class="rc-rate">${r.rate}</div>
+        </div>
+        <span class="rc-pill ${rank==='p1'?'p1':'p2'}">${rank==='p1'?'Primary pick':'Also consider'}</span>
+      </div>
+      ${sigHtml}
+      <div class="rc-desc">${r.desc}</div>
+      <div class="rc-why">💡 ${r.why}</div>
+      ${disclaimerHtml}
+    </div>`;
+}
+
+function renderPanel(key) {
+  document.getElementById('emptyCard').style.display = 'none';
+  ['logicCard','signalsCard','icpCard'].forEach(id => document.getElementById(id).style.display = 'block');
+
+  const d = REC[key];
+  document.getElementById('logicTitle').textContent = `${PRODUCTS[key].shortName} → recommendations`;
+
+  document.getElementById('logicContent').innerHTML = `
+    <table class="logic-table">
+      <thead><tr><th>Rank</th><th>Product</th><th>Signal</th><th>Key reason</th></tr></thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:800;color:var(--purple)">1st</td>
+          <td class="hl">${PRODUCTS[d.p1.key].name}</td>
+          <td class="hl">${d.p1.signal !== null ? d.p1.signal+'%' : '—'}</td>
+          <td class="dim">${d.p1.why.replace(/<[^>]+>/g,'').substring(0,90)}…</td>
+        </tr>
+        <tr>
+          <td style="color:var(--text-muted);font-weight:600">2nd</td>
+          <td>${PRODUCTS[d.p2.key].name}</td>
+          <td>${d.p2.signal !== null ? d.p2.signal+'%' : '—'}</td>
+          <td class="dim">${d.p2.why.replace(/<[^>]+>/g,'').substring(0,90)}…</td>
+        </tr>
+        ${(key==='cashisa'||key==='easyaccess') ? `<tr><td><span class="no-badge">No LISA</span></td><td colspan="3" class="dim">CISA ICP skews 45+. Only 3% actual PLG transition. Eligibility risk outweighs upside.</td></tr>` : ''}
+      </tbody>
+    </table>
+    <div class="reasoning-box">
+      <span class="rl">Primary reasoning</span>
+      ${d.p1.why}
+    </div>
+    ${d.p1.disclaimer || d.p2.disclaimer ? `<div class="flag-box">⚠️ ${d.p1.disclaimer||d.p2.disclaimer}</div>` : ''}
+  `;
+
+  const sigs = SIGNALS[key] || [];
+  document.getElementById('signalsContent').innerHTML = sigs.map(([src,metric,val]) => `
+    <div class="signal-row">
+      <span class="sig-source">${src}</span>
+      <span class="sig-metric">${metric}</span>
+      <span class="sig-value ${val.includes('£')||val.includes('%') ? '' : 'neutral'}">${val}</span>
+    </div>`).join('');
+
+  const icp = ICP[key];
+  document.getElementById('icpContent').innerHTML = `
+    <div style="margin-bottom:12px;">${icp.chips.map(c=>`<span class="icp-chip">${c}</span>`).join('')}</div>
+    <dl class="icp-detail">
+      <dt>Age range</dt><dd>${icp.age}</dd>
+      <dt>Job to be done</dt><dd>${icp.jtbd}</dd>
+      <dt>D14 LTV</dt><dd>12m: ${icp.ltv['12m']} · 24m: ${icp.ltv['24m']}</dd>
+    </dl>
+    <div class="reasoning-box" style="margin-top:12px;">${icp.note}</div>
+  `;
+}
+</script>
+</body>
+</html>
