@@ -693,11 +693,11 @@ const REC = {
         disclaimer: null
       },
       p2: {
-        key:'easyaccess', icon:'⚡', bg:'#FEF3C7', rate:'5.17% AER',
-        desc:'A flexible pot alongside your ISA — for money you might need to access before the ISA fills up.',
-        why:'Experian data: <strong>70–80%</strong> of Cash ISA users have an Easy Access account elsewhere. Only <strong>1%</strong> have it on Plum — suppressed demand, not lack of intent. Rate arbitrage is the hook.',
-        signal: 1.0, sigLabel: 'Have it on Plum (Experian baseline)',
-        disclaimer: '⚠️ LISA is not recommended here. The Cash ISA ICP is Active Optimisers (AO Sub-A: HoH 58 · AO Sub-B: HoH 44) — both outside the 18–39 eligibility window. Only 3% transition to LISA — friction outweighs upside.'
+        key:'investments', icon:'📈', bg:'#FFE4E6', rate:'Tax-free growth',
+        desc:'Put some savings to work alongside your Cash ISA. Tax-free investing in one place.',
+        why:'JTBD research: AO Sub-B (Active Accumulator, HoH 44) explicitly name "CISA + ETF ISA in one provider" as an unmet need — currently splitting across Plum and InvestEngine. AO Sub-A are <strong>"actively considering their first S&S ISA"</strong> but Plum never surfaces it. RFM data confirms 0% organic discovery. Pure visibility gap.',
+        signal: null, sigLabel: null,
+        disclaimer: '⚠️ LISA is not recommended here. AO Sub-A (HoH 58) and AO Sub-B (HoH 44) are outside the 18–39 window. S&S ISA carries no eligibility constraint and addresses the named unmet JTBD directly.'
       }
     },
     lisa: {
@@ -744,11 +744,11 @@ const REC = {
         disclaimer: null
       },
       p2: {
-        key:'lisa', icon:'🏠', bg:'#D1FAE5', rate:'25% government bonus',
-        desc:'Get a 25% government top-up on up to £4,000/year. For your first home or retirement.',
-        why:'<strong>7.3%</strong> ISA/GIA transition to LISA — the highest LISA signal of any first product. HB Sub-B (G21 Dual Diligence, HoH 39.7, 30–45) has the strongest under-40 concentration. HB Sub-A (HoH 44) also has a meaningful eligible subset. This is the one scenario where LISA as a secondary is defensible.',
-        signal: 7.3, sigLabel: 'PLG transition rate',
-        disclaimer: '⚠️ Must be aged 18–39 to open a Lifetime ISA. Show eligibility copy on the recommendation card. Fallback: Easy Access if user dismisses or is ineligible.'
+        key:'pluminterest', icon:'💸', bg:'#D1FAE5', rate:'Earn automatically',
+        desc:'Earn interest on cash sitting in Plum automatically — on top of your investment returns.',
+        why:'JTBD research: HB investors already hold ISAs at HL, Vanguard, and InvestEngine — they don\'t need more ISA products, they need depth on what they have. Plum Interest earns on uninvested cash with <strong>zero eligibility constraint</strong>. LISA removed: HoH 44+ and property owners in HB Sub-A are outside the 18–39 window — eligibility misfires outweigh the 7.3% PLG transition signal.',
+        signal: null, sigLabel: null,
+        disclaimer: null
       }
     }
 };
@@ -764,12 +764,13 @@ const SIGNALS = {
     ['D14 LTV (24m)', 'Cash ISA single-product', '£118.88'],
   ],
   cashisa: [
+    ['Transition matrix', 'Cash ISA → Plum Interest (started)', '37.1%'],
     ['Transition matrix', 'Cash ISA → LISA', '3.0%'],
     ['Transition matrix', 'Cash ISA → Easy Access', '1.0%'],
-    ['Onboarding started', 'Cash ISA + Plum Interest', '37.1%'],
-    ['Onboarding started', 'Cash ISA + LISA', '6.4%'],
-    ['Experian data', 'CISA users with Easy Access elsewhere', '70–80%'],
-    ['RFM data', 'CISA users with Easy Access on Plum', '~1%'],
+    ['JTBD research', 'AO Sub-B unmet need: CISA + ETF ISA in one provider', 'Named gap'],
+    ['JTBD research', 'AO Sub-A: "next one will be stocks and shares"', 'Discovery gap'],
+    ['RFM data', 'S&S ISA organic 2nd product adoption (Active Capital)', '0–15%'],
+    ['RFM data', 'Easy Access organic 2nd product adoption', '~0%'],
     ['D14 LTV (24m)', 'Cash ISA single-product', '£118.88'],
   ],
   lisa: [
@@ -790,12 +791,14 @@ const SIGNALS = {
   ],
   investments: [
     ['Transition matrix', '→ Cash ISA', '5.2%'],
-    ['Transition matrix', '→ LISA', '7.3%'],
+    ['Transition matrix', '→ LISA (removed from rec)', '7.3%'],
     ['Transition matrix', '→ Easy Access', '2.1%'],
     ['D14 LTV (24m)', 'ISA/GIA single-product', '£76.02'],
     ['ICP', 'HB Sub-A — Platform Builder (F17)', 'HoH 44 · Plum balance £6,024 · SoW 5.9%'],
     ['ICP', 'HB Sub-B — Aspiring Builder (G21)', 'HoH 39.7 · Plum balance £5,051 · SoW 7.9%'],
-    ['LISA eligibility', 'Meaningful under-40 subset in both HB sub-segments', 'Sub-B strongest candidate'],
+    ['JTBD research', 'HB users hold ISAs elsewhere; consolidation need not ISA cross-sell', 'Platform depth play'],
+    ['JTBD research', 'LISA eligibility: HoH 44+ and property owners excluded', 'Misfires outweigh signal'],
+    ['RFM data', 'Plum Interest organic 2nd product adoption', '0–2%'],
   ],
 };
 
@@ -812,7 +815,7 @@ const ICP = {
     age: 'AO Sub-A: HoH 58, age 45–65+ · AO Sub-B: HoH 44, age 35–55. Both outside LISA\'s 18–39 window.',
     jtbd: 'Maximise returns on accumulated cash with full capital protection and tax efficiency.',
     ltv: { 'Plum balance': '£15,342 (AO archetype)', 'SoW': '9.9%' },
-    note: 'Active Optimisers (AO) are Plum\'s highest-balance users. Sub-A (K33 Interest Seekers, HoH 58) are largely mortgage-free (54.5% own outright) with £45k savings and 83% savings account penetration — will leave for a better rate. Sub-B (F16 Mortgage Masters, HoH 44, £110k HH income) are still accumulating and have the highest investable assets (£167k). Both are outside LISA\'s 18–39 window. Experian: 70–80% of CISA users hold Easy Access elsewhere, only ~1% on Plum. Source: Experian Mosaic FGXI, Aug–Sep 2026.'
+    note: 'Active Optimisers (AO) are Plum\'s highest-balance users (£15,342). Sub-A (K33 Interest Seekers, HoH 58) are largely mortgage-free with £45k savings and 83% savings account penetration — will leave for a better rate. Sub-B (F16 Mortgage Masters, HoH 44, £110k HH income) hold the highest investable assets (£167k) and are in active accumulation. Key unmet need from JTBD research (Cash-heavy User Interviews, Aug 2026): AO Sub-B explicitly names "CISA + ETF ISA in one provider" — currently splitting Plum (CISA) and InvestEngine (ETFs). AO Sub-A are "actively considering their first S&S ISA" but Plum never surfaces it. Both are outside LISA\'s 18–39 window. Source: Experian Mosaic FGXI + JTBD Research, Aug–Sep 2026.'
   },
   lisa: {
     chips: ['CS Sub-B — Aspiring Owner (26–45)'],
@@ -833,7 +836,7 @@ const ICP = {
     age: 'Sub-A: HoH 44, 35–48 · Sub-B: HoH 39.7, 30–45. Both have a meaningful under-40 subset.',
     jtbd: 'Grow wealth intelligently across a complex, multi-platform financial life — without it becoming a second job.',
     ltv: { 'Plum balance': 'Sub-A £6,024 · Sub-B £5,051', 'SoW': 'Sub-A 5.9% · Sub-B 7.9%' },
-    note: 'Household Builders (HB) are Plum\'s most financially active users. Sub-A (F17 Smart Upgraders, HoH 44) are dual-income professionals managing wealth across multiple platforms — Plum competes with HL and Vanguard. Sub-B (G21 Dual Diligence, HoH 39.7) may have Plum as their first and only investment platform — the highest consolidation opportunity in the dataset. Both sub-segments have a meaningful under-40 population making LISA defensible as a secondary. Sub-B is the stronger LISA candidate (HoH 39.7). Source: Experian Mosaic FGXI, Aug–Sep 2026.'
+    note: 'Household Builders (HB) are Plum\'s most financially active users. Sub-A (F17 Smart Upgraders, HoH 44) manage wealth across multiple platforms — Plum competes with HL and Vanguard. Sub-B (G21 Dual Diligence, HoH 39.7) may have Plum as their first investment platform — the highest consolidation opportunity in the dataset. JTBD research (Investor Interviews, Sep 2026): HB users already hold ISAs elsewhere and need platform depth, not more ISA products. LISA removed as P2: HoH 44 (Sub-A) and property owners in both sub-segments are outside the 18–39 window — eligibility misfires outweigh the 7.3% PLG transition signal. Plum Interest serves uninvested cash with zero eligibility constraint. Source: Experian Mosaic FGXI + JTBD Research, Aug–Sep 2026.'
   }
 };
 
@@ -929,7 +932,8 @@ function renderPanel(key) {
           <td>${d.p2.signal !== null ? d.p2.signal+'%' : '—'}</td>
           <td class="dim">${d.p2.why.replace(/<[^>]+>/g,'').substring(0,90)}…</td>
         </tr>
-        ${(key==='cashisa'||key==='easyaccess') ? `<tr><td><span class="no-badge">No LISA</span></td><td colspan="3" class="dim">AO Sub-A (HoH 58) and AO Sub-B (HoH 44) are outside the 18–39 window. Only 3% transition rate. Eligibility risk outweighs upside.</td></tr>` : ''}
+        ${(key==='cashisa'||key==='easyaccess') ? `<tr><td><span class="no-badge">No LISA</span></td><td colspan="3" class="dim">AO Sub-A (HoH 58) and AO Sub-B (HoH 44) are outside the 18–39 window. Only 3% transition rate. S&S ISA addresses the named unmet JTBD instead.</td></tr>` : ''}
+        ${key==='investments' ? `<tr><td><span class="no-badge">No LISA</span></td><td colspan="3" class="dim">HB Sub-A (HoH 44) and many Sub-B users are outside the 18–39 window or already own property. 7.3% PLG signal does not outweigh eligibility misfires. Plum Interest has no constraint.</td></tr>` : ''}
       </tbody>
     </table>
     <div class="reasoning-box">
